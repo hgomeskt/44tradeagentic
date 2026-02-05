@@ -1,0 +1,64 @@
+//@version=6
+indicator("44Trade Sniper v6.1 - Anti-Blackout", overlay=true)
+
+// --- CONFIGURAÇÕES UNIFICADAS ---
+doch_time = input.int(10, "Donchian Período")
+emab_per  = input.int(100, "Macro Tendência (EMA)")
+emac_per  = input.int(3, "Média 3 (Garcia)")
+emad_per  = input.int(13, "Média 13 (Garcia)")
+rsiLen    = 7
+atrLen    = 14
+
+// --- 1. BLINDAGEM DE DADOS (IMPEDE SCORE ZERO) ---
+// Se o request.security falhar, o nz() garante que o sistema use o valor anterior (v6.1 fix)
+high_15m = nz(request.security(syminfo.tickerid, "15", ta.highest(high, 1)), high)
+low_15m  = nz(request.security(syminfo.tickerid, "15", ta.lowest(low, 1)), low)
+
+// --- 2. CÁLCULOS TÉCNICOS ---
+rsi = ta.rsi(close, rsiLen)
+atr = ta.atr(atrLen)
+EMAB = nz(ta.ema(close, emab_per), ta.sma(close, emab_per)) 
+EMAC = ta.ema(hlc3, emac_per)
+EMAD = ta.ema(hlc3, emad_per)
+upper = ta.highest(high, doch_time)
+lower = ta.lowest(low, doch_time)
+
+// --- 3. LOGICA DE SCORE ACUMULATIVO ---
+has_trend = not na(EMAB)
+is_bullish = close > EMAB and EMAB >= nz(EMAB[1], EMAB)
+is_bearish = close < EMAB and EMAB <= nz(EMAB[1], EMAB)
+
+int current_score = 0
+if (has_trend)
+    current_score += 30 
+if (is_bullish or is_bearish)
+    current_score += 20
+if (volume > ta.sma(volume, 20) * 0.7) // Suavizado para 0.7 para evitar travas
+    current_score += 25
+if ((is_bullish and close >= high_15m) or (is_bearish and close <= low_15m))
+    current_score += 25 
+
+// --- 4. GATILHOS ---
+bullEngulf = (close[1] < open[1]) and (close > open) and (close > high[1])
+bearEngulf = (close[1] > open[1]) and (close < open) and (close < low[1])
+
+buySignal  = bullEngulf and (EMAC > EMAD) and (close > EMAB) and current_score >= 85
+sellSignal = bearEngulf and (EMAC < EMAD) and (close < EMAB) and current_score >= 85
+
+// --- VISUALIZAÇÃO ---
+plot(high_15m, "Garcia High", color=color.new(#b59704, 50), style=plot.style_stepline)
+plot(low_15m, "Garcia Low", color=color.new(#b59704, 50), style=plot.style_stepline)
+plot(EMAB, "Macro Sniper", color=is_bullish ? color.green : color.red, linewidth=2)
+
+plotshape(buySignal, "BUY", shape.labelup, location.belowbar, color.green, text="SNIPER BUY", textcolor=color.white, size=size.huge)
+plotshape(sellSignal, "SELL", shape.labeldown, location.abovebar, color.red, text="SNIPER SELL", textcolor=color.white, size=size.huge)
+
+// --- ALERTA AGENTIC ---
+if (buySignal or sellSignal)
+    alert('{"ticker":"' + syminfo.ticker + '", "acao":"' + (buySignal ? "BUY" : "SELL") + '", "rsi":' + str.tostring(rsi) + ', "atr":' + str.tostring(atr) + ', "score":' + str.tostring(current_score) + ', "pattern":"UltimateFusion"}', alert.freq_once_per_bar_close)
+
+// Debug Label
+var label debug_label = na
+if (barstate.islast)
+    label.delete(debug_label)
+    debug_label := label.new(bar_index, high, "Score: " + str.tostring(current_score) + "\nTrend: " + (has_trend ? "OK" : "ERRO"), color=color.black, textcolor=color.white)
