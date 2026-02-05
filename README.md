@@ -51,6 +51,10 @@ Native Integration: Direct execution within the Windows environment to minimize 
 
 Resilience via NSSM: The Python engine operates as a Windows Native Service via the Non-Sucking Service Manager.
 
+Self-Healing: Automatic recovery within milliseconds after system crashes or reboots, ensuring 24/5 autonomous operation without human intervention.
+
+Trade Management: Standardized execution with Stop Loss (800 pts) and Take Profit (2400 pts), managed via the official MT5 Python library.
+
 graph TD
     subgraph "Perception Layer (TradingView)"
         A[Pine Script v6.1] -->|JSON Webhook| B(Signal Scoring > 85)
@@ -76,7 +80,3 @@ graph TD
 
     style G fill:#f96,stroke:#333,stroke-width:2px
     style D fill:#69f,stroke:#333,stroke-width:2px
-
-Self-Healing: Automatic recovery within milliseconds after system crashes or reboots, ensuring 24/5 autonomous operation without human intervention.
-
-Trade Management: Standardized execution with Stop Loss (800 pts) and Take Profit (2400 pts), managed via the official MT5 Python library.
