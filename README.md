@@ -1,9 +1,11 @@
-44tradeagentic: Adaptive Decision Engine
+44tradeagentic: 
+Adaptive Decision Engine
+
 **An Agentic Microservices Infrastructure for Algorithmic Execution and Risk Governance.**
 
 The **44Trade Sniper** is an autonomous, modular decision ecosystem designed for real-time financial signal processing. The system operates on a **Closed-Loop architecture**, integrating quantitative technical analysis, semantic LLM filtering, and probabilistic Machine Learning models to ensure high precision and systemic stability.
 
-## 🛠️ Technology Stack
+## Technology Stack
 * **Perception:** Pine Script v6.1 (Data Ingestion & Signal Scoring).
 * **Orchestration:** n8n (Workflow Automation).
 * **Cognition:** GPT-4o Mini (Contextual Semantic Filtering).
@@ -14,7 +16,7 @@ The **44Trade Sniper** is an autonomous, modular decision ecosystem designed for
 
 ---
 
-## 📐 System Architecture
+## System Architecture
 
 ### 1. Detection Layer: The Radar (Pine Script)
 Acts as a pre-processor for market data, operating at the edge to reduce noise before transmission.
