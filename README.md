@@ -51,6 +51,32 @@ Native Integration: Direct execution within the Windows environment to minimize 
 
 Resilience via NSSM: The Python engine operates as a Windows Native Service via the Non-Sucking Service Manager.
 
+graph TD
+    subgraph "Perception Layer (TradingView)"
+        A[Pine Script v6.1] -->|JSON Webhook| B(Signal Scoring > 85)
+    end
+
+    subgraph "Nervous System (Orchestration)"
+        B --> C{n8n Bus}
+        C --> D[GPT-4o Mini: Semantic Filter]
+        D --> E{JS Gatekeeper}
+    end
+
+    subgraph "Intelligence Layer (Inference)"
+        E -->|Validated POST| F[Python Core]
+        F --> G[[XGBoost Sniper v3]]
+        G --> H{Adaptive Threshold}
+        H -->|Decision: Execute/Veto| I[(SQLite3 Memory)]
+    end
+
+    subgraph "Execution Layer (Infrastructure)"
+        H -->|Trade Command| J[MetaTrader 5]
+        K[NSSM Service] -.->|Self-healing| F
+    end
+
+    style G fill:#f96,stroke:#333,stroke-width:2px
+    style D fill:#69f,stroke:#333,stroke-width:2px
+
 Self-Healing: Automatic recovery within milliseconds after system crashes or reboots, ensuring 24/5 autonomous operation without human intervention.
 
 Trade Management: Standardized execution with Stop Loss (800 pts) and Take Profit (2400 pts), managed via the official MT5 Python library.
